@@ -1,8 +1,12 @@
 package com.koconr.smspam;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -10,10 +14,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 public class SmsList extends AppCompatActivity {
+    private static int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.checkPermissionValidity();
         setContentView(R.layout.activity_sms_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -49,4 +55,17 @@ public class SmsList extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    private void checkPermissionValidity() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.RECEIVE_SMS},
+                    this.MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+
+        }
+
+    }
+
 }
