@@ -1,4 +1,4 @@
-package com.koconr.smspam;
+package com.koconr.smspam.services;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -9,6 +9,9 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.telephony.SmsMessage;
 import android.util.Log;
+
+import com.koconr.smspam.R;
+import com.koconr.smspam.activities.SmsList;
 
 public class SmsReceiver extends BroadcastReceiver {
     @Override

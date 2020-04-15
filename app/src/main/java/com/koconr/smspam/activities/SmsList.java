@@ -1,4 +1,4 @@
-package com.koconr.smspam;
+package com.koconr.smspam.activities;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -12,6 +12,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.koconr.smspam.R;
 
 public class SmsList extends AppCompatActivity {
     private static int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
