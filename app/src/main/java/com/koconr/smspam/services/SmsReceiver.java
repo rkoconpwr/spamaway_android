@@ -1,57 +1,101 @@
 package com.koconr.smspam.services;
 
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.provider.Telephony;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
-import com.koconr.smspam.R;
-import com.koconr.smspam.activities.SmsList;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SmsReceiver extends BroadcastReceiver {
+    // LOKALNY ADRES IP KOMPUTERA W WIFI
+    private final static String BASE_URL = "http://192.168.0.0:8000/";
+    private final static String CONTENT_KEY = "content";
+
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.i("RECEIVING", "received message... I GUESS");
         if (Telephony.Sms.Intents.SMS_RECEIVED_ACTION.equals(intent.getAction())) {
             for (SmsMessage smsMessage : Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
-                NotificationCompat.Builder builder = this.buildNotification(smsMessage, context);
-                this.displayNotification(builder, context);
+                this.getIsSpamResponse(smsMessage, context);
             }
         }
     }
 
-    private NotificationCompat.Builder buildNotification(SmsMessage smsMessage, Context context) {
-        String messageBody = smsMessage.getMessageBody();
-        String messageHeader = smsMessage.getDisplayOriginatingAddress();
-        String title = "New SMS from: " + messageHeader;
+    private void getIsSpamResponse(SmsMessage smsMessage, Context context) {
+        String smsToCheck = smsMessage.getMessageBody();
+        RequestQueue queue = Volley.newRequestQueue(context);
+        String url = BASE_URL + "isspam";
+        final Notifications notification = new Notifications();
 
-        // Create an explicit intent for an Activity in your app
-        Intent intent = new Intent(context, SmsList.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+        final JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put(CONTENT_KEY, smsToCheck);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        final String requestBody = jsonBody.toString();
+        Log.i("BODY FORMAT", requestBody);
 
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "M_CH_ID")
-                .setSmallIcon(R.drawable.ic_warning_black)
-                .setContentTitle(title)
-                .setContentText(messageBody)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
+        // Request a string response from the provided URL.
+        // todo BODY jest dodawane TYLKO dla POST; dla GET jest ignorowane
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Display the first 500 characters of the response string.
+                        // textView.setText("Response is: "+ response.substring(0,500));
+                        if (notification.isSpam(response)) {
+                            notification.displayNotification(smsMessage, context);
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("RESPONSE ERRORLY", new String(error.networkResponse.data));
+                    }
+                })  {
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                try {
+                    return requestBody.getBytes("utf-8");
+                } catch (UnsupportedEncodingException uee) {
+                    VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
+                    return null;
+                }
+            }
 
-        return builder;
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type","application/json");
+                return headers;
+            }
+        };
+
+        // Add the request to the RequestQueue.
+        queue.add(stringRequest);
+
     }
 
-    private void displayNotification(NotificationCompat.Builder builder, Context context) {
-        int notificationId = 314;
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-        // notificationId is a unique int for each notification that you must define
-        notificationManager.notify(notificationId, builder.build());
 
-    }
+
 }
