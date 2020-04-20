@@ -55,7 +55,6 @@ public class SmsReceiver extends BroadcastReceiver {
 
 
         // Request a string response from the provided URL.
-        // todo BODY jest dodawane TYLKO dla POST; dla GET jest ignorowane
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
