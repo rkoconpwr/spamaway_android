@@ -22,8 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SmsReceiver extends BroadcastReceiver {
-    // LOKALNY ADRES IP KOMPUTERA W WIFI
-    private final static String BASE_URL = "http://192.168.0.0:8000/";
+    // DOCELOWY ADRES DOMENY
+    private final static String BASE_URL = "https://smsspamaway.ew.r.appspot.com/";
     private final static String CONTENT_KEY = "content";
 
     @Override
@@ -45,8 +45,7 @@ public class SmsReceiver extends BroadcastReceiver {
         final JSONObject jsonBody = new JSONObject();
         try {
             jsonBody.put(CONTENT_KEY, smsToCheck);
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
 
@@ -55,22 +54,29 @@ public class SmsReceiver extends BroadcastReceiver {
 
 
         // Request a string response from the provided URL.
-        // todo BODY jest dodawane TYLKO dla POST; dla GET jest ignorowane
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                response -> {
-                    // Display the first 500 characters of the response string.
-                    // textView.setText("Response is: "+ response.substring(0,500));
-                    if (notification.isSpam(response)) {
-                        notification.displayNotification(smsMessage, context);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Display the first 500 characters of the response string.
+                        // textView.setText("Response is: "+ response.substring(0,500));
+                        Log.i("MESSAGE RECEIVED!", response);
+                        if (notification.isSpam(response)) {
+                            notification.displayNotification(smsMessage, context);
+                        }
                     }
                 },
-                error -> Log.e("RESPONSE ERRORLY", new String(error.networkResponse.data))) {
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("RESPONSE ERRORLY", new String(error.networkResponse.data));
+                    }
+                })  {
             @Override
             public byte[] getBody() throws AuthFailureError {
                 try {
                     return requestBody.getBytes("utf-8");
-                }
-                catch (UnsupportedEncodingException uee) {
+                } catch (UnsupportedEncodingException uee) {
                     VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
                     return null;
                 }
@@ -79,7 +85,7 @@ public class SmsReceiver extends BroadcastReceiver {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headers = new HashMap<>();
-                headers.put("Content-Type", "application/json");
+                headers.put("Content-Type","application/json");
                 return headers;
             }
         };
@@ -88,6 +94,7 @@ public class SmsReceiver extends BroadcastReceiver {
         queue.add(stringRequest);
 
     }
+
 
 
 }
