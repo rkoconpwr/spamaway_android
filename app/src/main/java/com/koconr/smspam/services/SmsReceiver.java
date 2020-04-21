@@ -10,8 +10,6 @@ import android.util.Log;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -38,6 +36,7 @@ public class SmsReceiver extends BroadcastReceiver {
     }
 
     private void getIsSpamResponse(SmsMessage smsMessage, Context context) {
+        HttpsTrustManager.allowAllSSL();
         String smsToCheck = smsMessage.getMessageBody();
         RequestQueue queue = Volley.newRequestQueue(context);
         String url = BASE_URL + "isspam";
@@ -46,7 +45,8 @@ public class SmsReceiver extends BroadcastReceiver {
         final JSONObject jsonBody = new JSONObject();
         try {
             jsonBody.put(CONTENT_KEY, smsToCheck);
-        } catch (JSONException e) {
+        }
+        catch (JSONException e) {
             e.printStackTrace();
         }
 
@@ -57,27 +57,20 @@ public class SmsReceiver extends BroadcastReceiver {
         // Request a string response from the provided URL.
         // todo BODY jest dodawane TYLKO dla POST; dla GET jest ignorowane
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Display the first 500 characters of the response string.
-                        // textView.setText("Response is: "+ response.substring(0,500));
-                        if (notification.isSpam(response)) {
-                            notification.displayNotification(smsMessage, context);
-                        }
+                response -> {
+                    // Display the first 500 characters of the response string.
+                    // textView.setText("Response is: "+ response.substring(0,500));
+                    if (notification.isSpam(response)) {
+                        notification.displayNotification(smsMessage, context);
                     }
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e("RESPONSE ERRORLY", new String(error.networkResponse.data));
-                    }
-                })  {
+                error -> Log.e("RESPONSE ERRORLY", new String(error.networkResponse.data))) {
             @Override
             public byte[] getBody() throws AuthFailureError {
                 try {
                     return requestBody.getBytes("utf-8");
-                } catch (UnsupportedEncodingException uee) {
+                }
+                catch (UnsupportedEncodingException uee) {
                     VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
                     return null;
                 }
@@ -86,7 +79,7 @@ public class SmsReceiver extends BroadcastReceiver {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headers = new HashMap<>();
-                headers.put("Content-Type","application/json");
+                headers.put("Content-Type", "application/json");
                 return headers;
             }
         };
@@ -95,7 +88,6 @@ public class SmsReceiver extends BroadcastReceiver {
         queue.add(stringRequest);
 
     }
-
 
 
 }
