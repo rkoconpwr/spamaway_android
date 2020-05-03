@@ -1,8 +1,11 @@
 package com.koconr.smspam.services;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.telephony.SmsMessage;
@@ -28,7 +31,7 @@ public class Notifications {
     private NotificationCompat.Builder buildNotification(SmsMessage smsMessage, Context context, double spamProbability) {
         String messageHeader = smsMessage.getDisplayOriginatingAddress();
         String title = "Probable SPAM detected!";
-        String messageBody = String.format("Last message from %s is for %f spam", messageHeader, spamProbability);
+        String messageBody = String.format("Last message from %s is for %d%% spam", messageHeader, (int)(spamProbability*100));
 
         // Create an explicit intent for an Activity in your app
         Intent intent = new Intent(context, SmsList.class);
@@ -48,11 +51,27 @@ public class Notifications {
     }
 
     private void displayNotification(NotificationCompat.Builder builder, Context context) {
-        int notificationId = 315;
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            NotificationManager manager =
+                    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            String channelId = "Your_channel_id";
+            NotificationChannel channel = new NotificationChannel(
+                    channelId,
+                    "Channel human readable title",
+                    NotificationManager.IMPORTANCE_HIGH);
+            manager.createNotificationChannel(channel);
+            builder.setChannelId(channelId);
+            manager.notify(315, builder.build());
+        }
+        else{
+            int notificationId = 315;
+            NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
+            notificationManagerCompat.notify(notificationId, builder.build());
+        }
         Log.i("Wywalam powiadomienie", "asdasdasd");
-        // notificationId is a unique int for each notification that you must define
-        notificationManager.notify(notificationId, builder.build());
+
 
     }
 }
