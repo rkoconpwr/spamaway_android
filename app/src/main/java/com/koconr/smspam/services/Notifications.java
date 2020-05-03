@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.telephony.SmsMessage;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.koconr.smspam.R;
@@ -14,21 +15,20 @@ import com.koconr.smspam.model.SpamProbabilityModel;
 
 public class Notifications {
 
-    public boolean isSpam(String responseString) {
+    public SpamProbabilityModel isSpam(String responseString) {
         Gson gson = new Gson();
-        SpamProbabilityModel response = gson.fromJson(responseString, SpamProbabilityModel.class);
-        return response.isSpam();
+        return gson.fromJson(responseString, SpamProbabilityModel.class);
     }
 
-    public void displayNotification(SmsMessage smsMessage, Context context) {
-        NotificationCompat.Builder builder = this.buildNotification(smsMessage, context);
+    public void displayNotification(SmsMessage smsMessage, Context context, float spamProbability) {
+        NotificationCompat.Builder builder = this.buildNotification(smsMessage, context,spamProbability);
         this.displayNotification(builder, context);
     }
 
-    private NotificationCompat.Builder buildNotification(SmsMessage smsMessage, Context context) {
-        String messageBody = smsMessage.getMessageBody();
+    private NotificationCompat.Builder buildNotification(SmsMessage smsMessage, Context context, double spamProbability) {
         String messageHeader = smsMessage.getDisplayOriginatingAddress();
-        String title = "New spam message from: " + messageHeader;
+        String title = "Probable SPAM detected!";
+        String messageBody = String.format("Last message from %s is for %f spam", messageHeader, spamProbability);
 
         // Create an explicit intent for an Activity in your app
         Intent intent = new Intent(context, SmsList.class);
@@ -48,8 +48,9 @@ public class Notifications {
     }
 
     private void displayNotification(NotificationCompat.Builder builder, Context context) {
-        int notificationId = 314;
+        int notificationId = 315;
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+        Log.i("Wywalam powiadomienie", "asdasdasd");
         // notificationId is a unique int for each notification that you must define
         notificationManager.notify(notificationId, builder.build());
 
