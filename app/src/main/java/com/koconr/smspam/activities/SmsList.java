@@ -1,8 +1,10 @@
 package com.koconr.smspam.activities;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.provider.Telephony;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -34,6 +36,14 @@ public class SmsList extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        if(!Telephony.Sms.getDefaultSmsPackage(getApplicationContext()).equals(getApplicationContext().getPackageName())) {
+            //Store default sms package name
+            Intent intent = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT);
+            intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME,
+                    getApplicationContext().getPackageName());
+            startActivity(intent);
+        }
     }
 
     @Override

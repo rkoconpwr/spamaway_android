@@ -28,7 +28,7 @@ public class SmsReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (Telephony.Sms.Intents.SMS_RECEIVED_ACTION.equals(intent.getAction())) {
             for (SmsMessage smsMessage : Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
-                this.getIsSpamResponse(smsMessage, context);
+                //this.getIsSpamResponse(smsMessage, context);
             }
         }
     }
@@ -59,6 +59,7 @@ public class SmsReceiver extends BroadcastReceiver {
                     // textView.setText("Response is: "+ response.substring(0,500));
                     Log.i("MESSAGE RECEIVED!", response);
                     if (notification.isSpam(response)) {
+                        //abortBroadcast();
                         notification.displayNotification(smsMessage, context);
                     }
                 },
