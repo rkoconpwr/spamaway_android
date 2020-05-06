@@ -11,6 +11,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.koconr.smspam.model.SpamProbabilityModel;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -58,11 +59,12 @@ public class SmsReceiver extends BroadcastReceiver {
                     // Display the first 500 characters of the response string.
                     // textView.setText("Response is: "+ response.substring(0,500));
                     Log.i("MESSAGE RECEIVED!", response);
-                    if (notification.isSpam(response)) {
-                        notification.displayNotification(smsMessage, context);
+                    SpamProbabilityModel spamProbability = notification.isSpam(response);
+                    if (spamProbability.isSpam()) {
+                        notification.displayNotification(smsMessage, context, spamProbability.getSpamPropability());
                     }
                 },
-                error -> Log.e("RESPONSE ERRORLY", new String(error.networkResponse.data))) {
+                error -> Log.e("RESPONSE ERRORLY", new String(error.networkResponse != null ? error.networkResponse.data : new byte[]{}))) {
             @Override
             public byte[] getBody() {
                 return requestBody.getBytes(StandardCharsets.UTF_8);

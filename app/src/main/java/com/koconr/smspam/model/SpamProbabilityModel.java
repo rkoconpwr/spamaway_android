@@ -8,4 +8,8 @@ public class SpamProbabilityModel {
     public boolean isSpam() {
         return  spamPropability > 0.5;
     }
+
+    public float getSpamPropability() {
+        return spamPropability;
+    }
 }
