@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.koconr.smspam.R;
 import com.wdullaer.swipeactionadapter.SwipeActionAdapter;
@@ -31,6 +32,8 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sms_list);
         this.checkPermissionValidity();
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setActionBar(toolbar);
 
         this.initListView();
     }
