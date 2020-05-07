@@ -13,7 +13,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.koconr.smspam.R;
-import com.koconr.smspam.activities.SmsList;
+import com.koconr.smspam.activities.SmsListActivity;
 import com.koconr.smspam.model.SpamProbabilityModel;
 
 public class Notifications {
@@ -34,7 +34,7 @@ public class Notifications {
         String messageBody = String.format("Last message from %s is for %d%% spam", messageHeader, (int)(spamProbability*100));
 
         // Create an explicit intent for an Activity in your app
-        Intent intent = new Intent(context, SmsList.class);
+        Intent intent = new Intent(context, SmsListActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 

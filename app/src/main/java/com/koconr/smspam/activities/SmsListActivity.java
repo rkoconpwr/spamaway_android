@@ -22,13 +22,14 @@ import com.wdullaer.swipeactionadapter.SwipeDirection;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class SmsList extends ListActivity implements SwipeActionAdapter.SwipeActionListener {
+public class SmsListActivity extends ListActivity implements SwipeActionAdapter.SwipeActionListener {
     private static int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
     protected SwipeActionAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_sms_list);
         this.checkPermissionValidity();
 
         this.initListView();

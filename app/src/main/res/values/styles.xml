@@ -8,6 +8,20 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!-- ToolBar -->
+    <style name="ToolBarStyle" parent="Theme.AppCompat">
+        <item name="android:textColorPrimary">@color/icons</item>
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:textColorSecondary">@color/colorPrimaryLight</item>
+    </style>
+
+    <!-- List -->
+    <style name="ListStyle" parent="Theme.AppCompat">
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="android:background">@color/listBackground</item>
+        <item name="android:textColorSecondary">@color/textColorSecondary</item>
+    </style>
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
