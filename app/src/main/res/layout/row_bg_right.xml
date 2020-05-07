@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="?android:listPreferredItemHeight"
+    android:gravity="center_vertical"
+    android:background="@color/rightNear">
+
+    <TextView
+        android:id="@+id/editText"
+        android:paddingStart="8sp"
+        android:paddingEnd="8sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="viewEnd"
+        android:ems="10"
+        android:textSize="@dimen/card_text_length"
+        android:textColor="@color/cardTextColor"
+        android:text="@string/spam"/>
+
+</LinearLayout>

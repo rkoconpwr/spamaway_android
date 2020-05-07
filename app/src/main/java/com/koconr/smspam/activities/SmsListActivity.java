@@ -53,7 +53,6 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
         // Wrap your content in a SwipeActionAdapter
         mAdapter = new SwipeActionAdapter(stringAdapter);
 
-        Log.e("SCREW YOU", "SCREW YOU, ANDROID");
         // Pass a reference of your ListView to the SwipeActionAdapter
         mAdapter.setSwipeActionListener(this)
                 .setDimBackgrounds(true)
@@ -61,6 +60,12 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
 
         // Set the SwipeActionAdapter as the Adapter for your ListView
         setListAdapter(mAdapter);
+
+        // Set backgrounds for the swipe directions
+        mAdapter.addBackground(SwipeDirection.DIRECTION_FAR_LEFT,R.layout.row_bg_left_far)
+                .addBackground(SwipeDirection.DIRECTION_NORMAL_LEFT,R.layout.row_bg_left)
+                .addBackground(SwipeDirection.DIRECTION_FAR_RIGHT,R.layout.row_bg_right_far)
+                .addBackground(SwipeDirection.DIRECTION_NORMAL_RIGHT,R.layout.row_bg_right);
     }
 
     @Override
