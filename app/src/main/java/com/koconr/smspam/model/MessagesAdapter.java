@@ -32,7 +32,9 @@ public class MessagesAdapter extends ArrayAdapter<Message> {
 
         if (message != null) {
             TextView smsPrimaryView = convertView.findViewById(R.id.smsPrimaryText);
+            TextView smsSecondaryView = convertView.findViewById(R.id.smsSecondaryText);
             smsPrimaryView.setText(message.sender);
+            smsSecondaryView.setText(message.content);
         }
 
         return convertView;
