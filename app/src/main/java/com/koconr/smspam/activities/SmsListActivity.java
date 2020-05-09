@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.Toolbar;
@@ -21,6 +20,7 @@ import com.koconr.smspam.R;
 import com.koconr.smspam.database.AppExecutors;
 import com.koconr.smspam.database.DataBaseCache;
 import com.koconr.smspam.model.Message;
+import com.koconr.smspam.model.MessagesAdapter;
 import com.wdullaer.swipeactionadapter.SwipeActionAdapter;
 import com.wdullaer.swipeactionadapter.SwipeDirection;
 
@@ -45,7 +45,7 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
         AppExecutors.getInstance().databaseThread().execute(
                 () -> {
                     dataBaseCache = new DataBaseCache(context);
-                    initListView();
+                    runOnUiThread(this::initListView);
                 }
         );
     }
@@ -53,18 +53,14 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
     private void initListView() {
 
         // Create an Adapter for your content
-        String[] content = new String[20];
-        for (int i=0;i<20;i++) content[i] = "Row "+(i+1);
         final List<Message> spamList = dataBaseCache.getAllMessages();
-        ArrayAdapter<String> stringAdapter = new ArrayAdapter<String>(
+        MessagesAdapter messagesAdapter = new MessagesAdapter(
                 this,
-                R.layout.content_sms_list,
-                R.id.text,
-                content // dataBaseCache.getAllMessages()
+                new ArrayList<>(spamList)
         );
 
         // Wrap your content in a SwipeActionAdapter
-        mAdapter = new SwipeActionAdapter(stringAdapter);
+        mAdapter = new SwipeActionAdapter(messagesAdapter);
 
         // Pass a reference of your ListView to the SwipeActionAdapter
         mAdapter.setSwipeActionListener(this)
@@ -108,7 +104,7 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
             // Permission is not granted
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.RECEIVE_SMS},
-                    this.MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+                    MY_PERMISSIONS_REQUEST_READ_CONTACTS);
 
         }
 
