@@ -3,6 +3,7 @@ package com.koconr.smspam.activities;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -17,25 +18,36 @@ import android.widget.Toast;
 import android.widget.Toolbar;
 
 import com.koconr.smspam.R;
+import com.koconr.smspam.database.AppExecutors;
+import com.koconr.smspam.database.DataBaseCache;
+import com.koconr.smspam.model.Message;
 import com.wdullaer.swipeactionadapter.SwipeActionAdapter;
 import com.wdullaer.swipeactionadapter.SwipeDirection;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class SmsListActivity extends ListActivity implements SwipeActionAdapter.SwipeActionListener {
     private static int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
+    private DataBaseCache dataBaseCache;
     protected SwipeActionAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Context context = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sms_list);
         this.checkPermissionValidity();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setActionBar(toolbar);
 
-        this.initListView();
+        AppExecutors.getInstance().databaseThread().execute(
+                () -> {
+                    dataBaseCache = new DataBaseCache(context);
+                    initListView();
+                }
+        );
     }
 
     private void initListView() {
@@ -43,11 +55,12 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
         // Create an Adapter for your content
         String[] content = new String[20];
         for (int i=0;i<20;i++) content[i] = "Row "+(i+1);
+        final List<Message> spamList = dataBaseCache.getAllMessages();
         ArrayAdapter<String> stringAdapter = new ArrayAdapter<String>(
                 this,
                 R.layout.content_sms_list,
                 R.id.text,
-                new ArrayList<String>(Arrays.asList(content))
+                content // dataBaseCache.getAllMessages()
         );
 
         // Wrap your content in a SwipeActionAdapter
@@ -55,7 +68,6 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
 
         // Pass a reference of your ListView to the SwipeActionAdapter
         mAdapter.setSwipeActionListener(this)
-                .setDimBackgrounds(true)
                 .setListView(getListView());
 
         // Set the SwipeActionAdapter as the Adapter for your ListView

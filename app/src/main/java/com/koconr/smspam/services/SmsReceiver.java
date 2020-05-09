@@ -11,6 +11,8 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.koconr.smspam.database.AppExecutors;
+import com.koconr.smspam.database.DataBaseCache;
 import com.koconr.smspam.model.SpamProbabilityModel;
 
 import org.json.JSONException;
@@ -61,6 +63,15 @@ public class SmsReceiver extends BroadcastReceiver {
                     Log.i("MESSAGE RECEIVED!", response);
                     SpamProbabilityModel spamProbability = notification.isSpam(response);
                     if (spamProbability.isSpam()) {
+                        String sender = smsMessage.getDisplayOriginatingAddress();
+                        String content = smsMessage.getMessageBody();
+
+                        AppExecutors.getInstance().databaseThread().execute(
+                                () -> {
+                                    final DataBaseCache dataBaseCache = new DataBaseCache(context);
+                                    dataBaseCache.addMessage(sender, content);
+                                }
+                        );
                         notification.displayNotification(smsMessage, context, spamProbability.getSpamPropability());
                     }
                 },
