@@ -16,21 +16,30 @@ import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
+import com.android.volley.Request;
+import com.android.volley.toolbox.StringRequest;
 import com.koconr.smspam.R;
 import com.koconr.smspam.database.AppExecutors;
 import com.koconr.smspam.database.DataBaseCache;
 import com.koconr.smspam.model.Message;
 import com.koconr.smspam.model.MessagesAdapter;
+import com.koconr.smspam.params.Params;
 import com.wdullaer.swipeactionadapter.SwipeActionAdapter;
 import com.wdullaer.swipeactionadapter.SwipeDirection;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SmsListActivity extends ListActivity implements SwipeActionAdapter.SwipeActionListener {
     private static int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
     private DataBaseCache dataBaseCache;
+    private ArrayList<Message> spamList;
     protected SwipeActionAdapter mAdapter;
 
     @Override
@@ -53,10 +62,10 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
     private void initListView() {
 
         // Create an Adapter for your content
-        final List<Message> spamList = dataBaseCache.getAllMessages();
+        spamList = new ArrayList<>(dataBaseCache.getAllMessages());
         MessagesAdapter messagesAdapter = new MessagesAdapter(
                 this,
-                new ArrayList<>(spamList)
+                spamList
         );
 
         // Wrap your content in a SwipeActionAdapter
@@ -121,8 +130,8 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
 
     @Override
     public boolean hasActions(int position, SwipeDirection direction){
-        if(direction.isLeft()) return true;
-        if(direction.isRight()) return true;
+        if(direction.equals(SwipeDirection.DIRECTION_NORMAL_LEFT)) return true;
+        if(direction.equals(SwipeDirection.DIRECTION_NORMAL_RIGHT)) return true;
         return false;
     }
 
@@ -139,27 +148,83 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
             String dir = "";
 
             switch (direction) {
-                case DIRECTION_FAR_LEFT:
-                    dir = "Far left";
-                    break;
                 case DIRECTION_NORMAL_LEFT:
                     dir = "Left";
-                    break;
-                case DIRECTION_FAR_RIGHT:
-                    dir = "Far right";
+                    this.swipeLeftNotSpam(position);
                     break;
                 case DIRECTION_NORMAL_RIGHT:
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle("Test Dialog").setMessage("You swiped right").create().show();
                     dir = "Right";
+                    this.swipeRightIsSpam(position);
                     break;
             }
             Toast.makeText(
                     this,
-                    dir + " swipe Action triggered on " + mAdapter.getItem(position),
+                    dir + " swipe Action triggered on " + position,
                     Toast.LENGTH_SHORT
             ).show();
-            mAdapter.notifyDataSetChanged();
         }
+    }
+
+    private void swipeLeftNotSpam(int position) {
+        this.deleteFromDatabase(position, false);
+    }
+
+    private void swipeRightIsSpam(int position) {
+        this.deleteFromDatabase(position, true);
+    }
+
+    private void deleteFromDatabase(int position, boolean isSpam) {
+        AppExecutors.getInstance().databaseThread().execute(
+                () -> {
+                    ArrayList<Message> messages = new ArrayList<>(dataBaseCache.getAllMessages());
+                    Message message = messages.get(position);
+                    // this.postSMSToServer(message, isSpam);
+                    dataBaseCache.deleteMessage(message);
+                }
+        );
+        spamList.remove(position);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    private void postSMSToServer(Message message, boolean isSpam) {
+        String url;
+        try {
+            url = Params.getUrl(Params.CHECK_IF_SPAM);
+            // url = Params.getUrl(Params.SEND_TO_DATABASE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ;
+        }
+
+        final JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("sender", message.sender);
+            jsonBody.put("content", message.content);
+            jsonBody.put("isSpam", isSpam);
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+        final String requestBody = jsonBody.toString();
+
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                response -> {
+                    Log.i("POSITIVELY SENT TO DATABASE!", response);
+                },
+                error -> Log.e("RESPONSE ERRORLY", new String(error.networkResponse != null ? error.networkResponse.data : new byte[]{}))) {
+            @Override
+            public byte[] getBody() {
+                return requestBody.getBytes(StandardCharsets.UTF_8);
+            }
+
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                return headers;
+            }
+        };
+
     }
 }
