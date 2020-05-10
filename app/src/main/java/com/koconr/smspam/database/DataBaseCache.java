@@ -42,7 +42,7 @@ public class DataBaseCache {
     }
 
     public void addMessage(String sender, String content) {
-        Message message = new Message(findLastId(), sender, content);
+        Message message = new Message(findLastId() + 1, sender, content);
         messageDao.insert(message);
     }
 
