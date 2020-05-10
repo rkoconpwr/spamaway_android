@@ -11,6 +11,8 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.koconr.smspam.database.AppExecutors;
+import com.koconr.smspam.database.DataBaseCache;
 import com.koconr.smspam.model.SpamProbabilityModel;
 import com.koconr.smspam.params.Params;
 
@@ -71,8 +73,8 @@ public class SmsReceiver extends BroadcastReceiver {
 
                         AppExecutors.getInstance().databaseThread().execute(
                                 () -> {
-                                    final DataBaseCache dataBaseCache = new DataBaseCache(context);
-                                    dataBaseCache.addMessage(sender, content);
+                                    final DataBaseCache dataBaseCache = DataBaseCache.getDataBaseCache(context);
+                                    dataBaseCache.addMessage(sender, content, spamProbability.getSpamPropability());
                                 }
                         );
                         notification.displayNotification(smsMessage, context, spamProbability.getSpamPropability());

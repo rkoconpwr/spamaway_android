@@ -46,8 +46,8 @@ public class DataBaseCache {
         messages.add(message);
     }
 
-    public void addMessage(float spamProbability, String content) {
-        messageDao.insert(new Message(spamProbability, content));
+    public void addMessage(String sender, String content, float spamProbability) {
+        messageDao.insert(new Message(sender, content, spamProbability));
     }
 
     public void deleteMessage(Message message) {

@@ -44,7 +44,7 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
 
         AppExecutors.getInstance().databaseThread().execute(
                 () -> {
-                    dataBaseCache = new DataBaseCache(context);
+                    dataBaseCache = DataBaseCache.getDataBaseCache(context);
                     runOnUiThread(this::initListView);
                 }
         );
