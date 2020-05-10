@@ -11,21 +11,26 @@ import com.koconr.smspam.model.Message;
 import java.util.List;
 
 public class DataBaseCache {
-    private Context context;
+
+    private static DataBaseCache dataBaseCache;
+
+    public static DataBaseCache getDataBaseCache(Context context) {
+        if (dataBaseCache == null) dataBaseCache = new DataBaseCache(context);
+        return dataBaseCache;
+    }
+
     private AppDatabase db;
     private MessageDao messageDao;
     private List<Message> messages;
 
     @VisibleForTesting
-    public DataBaseCache(Context context, AppDatabase db, MessageDao messageDao, List<Message> messages) {
-        this.context = context;
+    public DataBaseCache(AppDatabase db, MessageDao messageDao, List<Message> messages) {
         this.db = db;
         this.messageDao = messageDao;
         this.messages = messages;
     }
 
-    public DataBaseCache(Context context) {
-        this.context = context;
+    private DataBaseCache(Context context) {
         db = Room.databaseBuilder(context,
                 AppDatabase.class, "database-name").build();
         messageDao = db.messageDao();
@@ -41,9 +46,8 @@ public class DataBaseCache {
         messages.add(message);
     }
 
-    public void addMessage(String sender, String content) {
-        Message message = new Message(findLastId(), sender, content);
-        messageDao.insert(message);
+    public void addMessage(float spamProbability, String content) {
+        messageDao.insert(new Message(spamProbability, content));
     }
 
     public void deleteMessage(Message message) {
@@ -60,12 +64,7 @@ public class DataBaseCache {
                 .ifPresent(message -> messages.remove(message));
     }
 
-    private int findLastId() {
-        return messages.stream()
-                .map(message -> message.uid)
-                .max(Integer::compareTo)
-                .orElse(0);
-    }
+
 
 
 }

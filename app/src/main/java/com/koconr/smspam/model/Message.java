@@ -7,18 +7,18 @@ import androidx.room.PrimaryKey;
 @Entity
 public class Message {
 
-    public Message(int uid, String sender, String content) {
-        this.uid = uid;
-        this.sender = sender;
+    public Message(float spamProbability, String content) {
+          this.spamProbability = spamProbability;
         this.content = content;
     }
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     public int uid;
-
-    @ColumnInfo(name = "sender")
-    public String sender;
 
     @ColumnInfo(name = "content")
     public String content;
+
+    @ColumnInfo(name = "spamProbability")
+    public float spamProbability;
+
 }

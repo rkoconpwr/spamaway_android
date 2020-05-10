@@ -11,12 +11,15 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.koconr.smspam.database.DataBaseCache;
+import com.koconr.smspam.model.Message;
 import com.koconr.smspam.model.SpamProbabilityModel;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
+import java.sql.DatabaseMetaData;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,6 +63,8 @@ public class SmsReceiver extends BroadcastReceiver {
                     // textView.setText("Response is: "+ response.substring(0,500));
                     Log.i("MESSAGE RECEIVED!", response);
                     SpamProbabilityModel spamProbability = notification.isSpam(response);
+                    DataBaseCache.getDataBaseCache(context).addMessage(spamProbability.getSpamPropability(), smsMessage.getMessageBody());
+
                     if (spamProbability.isSpam()) {
                         notification.displayNotification(smsMessage, context, spamProbability.getSpamPropability());
                     }
