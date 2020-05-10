@@ -11,8 +11,6 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.koconr.smspam.database.AppExecutors;
-import com.koconr.smspam.database.DataBaseCache;
 import com.koconr.smspam.model.SpamProbabilityModel;
 import com.koconr.smspam.params.Params;
 
