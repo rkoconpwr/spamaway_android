@@ -14,6 +14,7 @@ import com.android.volley.toolbox.Volley;
 import com.koconr.smspam.database.AppExecutors;
 import com.koconr.smspam.database.DataBaseCache;
 import com.koconr.smspam.model.SpamProbabilityModel;
+import com.koconr.smspam.params.Params;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,8 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SmsReceiver extends BroadcastReceiver {
-    // DOCELOWY ADRES DOMENY
-    private final static String BASE_URL = "https://smsspamaway.ew.r.appspot.com/";
     private final static String CONTENT_KEY = "content";
 
     @Override
@@ -40,7 +39,13 @@ public class SmsReceiver extends BroadcastReceiver {
         HttpsTrustManager.allowAllSSL();
         String smsToCheck = smsMessage.getMessageBody();
         RequestQueue queue = Volley.newRequestQueue(context);
-        String url = BASE_URL + "isspam";
+        String url;
+        try {
+            url = Params.getUrl(Params.CHECK_IF_SPAM);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ;
+        }
         final Notifications notification = new Notifications();
 
         final JSONObject jsonBody = new JSONObject();
