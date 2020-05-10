@@ -40,11 +40,13 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
     private static int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
     private DataBaseCache dataBaseCache;
     private ArrayList<Message> spamList;
+    private Context context;
     protected SwipeActionAdapter mAdapter;
+    private boolean hasPaused = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Context context = this;
+        context = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sms_list);
         this.checkPermissionValidity();
@@ -57,6 +59,35 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
                     runOnUiThread(this::initListView);
                 }
         );
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (this.hasPaused) {
+            AppExecutors.getInstance().databaseThread().execute(
+                    () -> {
+                        dataBaseCache = DataBaseCache.getDataBaseCache(context);
+                        ArrayList<Message> newSpamList = new ArrayList<>(dataBaseCache.getAllMessages());
+                        spamList.clear();
+                        spamList.addAll(newSpamList);
+                        runOnUiThread(() -> mAdapter.notifyDataSetChanged());
+                    }
+            );
+        }
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        this.hasPaused = true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        this.hasPaused = false;
     }
 
     private void initListView() {
