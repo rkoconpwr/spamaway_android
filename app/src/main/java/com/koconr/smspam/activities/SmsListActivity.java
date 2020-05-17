@@ -229,7 +229,6 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
 
         final JSONObject jsonBody = new JSONObject();
         try {
-            jsonBody.put("sender", message.sender);
             jsonBody.put("content", message.content);
             jsonBody.put("isSpam", isSpam);
         }
