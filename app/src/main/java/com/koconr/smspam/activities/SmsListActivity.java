@@ -16,6 +16,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
@@ -26,6 +27,7 @@ import com.koconr.smspam.database.DataBaseCache;
 import com.koconr.smspam.model.Message;
 import com.koconr.smspam.model.MessagesAdapter;
 import com.koconr.smspam.params.Params;
+import com.koconr.smspam.services.RequestQueueSingleton;
 import com.wdullaer.swipeactionadapter.SwipeActionAdapter;
 import com.wdullaer.swipeactionadapter.SwipeDirection;
 
@@ -221,7 +223,6 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
 
     private void postSMSToServer(Message message, boolean isSpam) {
         String url;
-        RequestQueue queue = Volley.newRequestQueue(context);
         try {
             url = Params.getUrl(Params.SEND_TO_DATABASE);
         } catch (Exception e) {
@@ -259,8 +260,11 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
         };
 
         // Add the request to the RequestQueue.
-
-        queue.add(stringRequest);
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 10,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueueSingleton.getInstance(context).addToRequestQueue(stringRequest);
 
     }
 }
