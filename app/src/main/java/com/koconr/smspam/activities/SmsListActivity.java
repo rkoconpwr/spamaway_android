@@ -17,7 +17,9 @@ import android.widget.Toast;
 import android.widget.Toolbar;
 
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.koconr.smspam.R;
 import com.koconr.smspam.database.AppExecutors;
 import com.koconr.smspam.database.DataBaseCache;
@@ -209,7 +211,7 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
                 () -> {
                     ArrayList<Message> messages = new ArrayList<>(dataBaseCache.getAllMessages());
                     Message message = messages.get(position);
-                    // this.postSMSToServer(message, isSpam);
+                    this.postSMSToServer(message, isSpam);
                     dataBaseCache.deleteMessage(message);
                 }
         );
@@ -219,9 +221,9 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
 
     private void postSMSToServer(Message message, boolean isSpam) {
         String url;
+        RequestQueue queue = Volley.newRequestQueue(context);
         try {
-            url = Params.getUrl(Params.CHECK_IF_SPAM);
-            // url = Params.getUrl(Params.SEND_TO_DATABASE);
+            url = Params.getUrl(Params.SEND_TO_DATABASE);
         } catch (Exception e) {
             e.printStackTrace();
             return ;
@@ -255,6 +257,10 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
                 return headers;
             }
         };
+
+        // Add the request to the RequestQueue.
+
+        queue.add(stringRequest);
 
     }
 }
