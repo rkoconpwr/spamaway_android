@@ -38,7 +38,6 @@ public class SmsReceiver extends BroadcastReceiver {
     private void getIsSpamResponse(SmsMessage smsMessage, Context context) {
         HttpsTrustManager.allowAllSSL();
         String smsToCheck = smsMessage.getMessageBody();
-        RequestQueue queue = Volley.newRequestQueue(context);
         String url;
         try {
             url = Params.getUrl(Params.CHECK_IF_SPAM);
@@ -95,8 +94,8 @@ public class SmsReceiver extends BroadcastReceiver {
         };
 
         // Add the request to the RequestQueue.
-        queue.add(stringRequest);
-
+//        queue.add(stringRequest);
+        RequestQueueSingleton.getInstance(context).addToRequestQueue(stringRequest);
     }
 
 

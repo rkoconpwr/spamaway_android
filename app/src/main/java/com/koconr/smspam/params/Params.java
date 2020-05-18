@@ -2,8 +2,8 @@ package com.koconr.smspam.params;
 
 public enum Params {
     BASE_URL("https://smsspamaway.ew.r.appspot.com/"),
-    CHECK_IF_SPAM("isspam");
-//    SEND_TO_DATABASE("UNKNOWN");
+    CHECK_IF_SPAM("isspam"),
+    SEND_TO_DATABASE("isspam/feedback/");
 
     public final String label;
 
