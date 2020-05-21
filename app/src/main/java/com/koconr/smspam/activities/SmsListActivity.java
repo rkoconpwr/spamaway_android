@@ -6,6 +6,7 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -18,9 +19,7 @@ import android.widget.Toolbar;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.koconr.smspam.R;
 import com.koconr.smspam.database.AppExecutors;
 import com.koconr.smspam.database.DataBaseCache;
@@ -37,8 +36,8 @@ import org.json.JSONObject;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SmsListActivity extends ListActivity implements SwipeActionAdapter.SwipeActionListener {
     private static int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
@@ -145,13 +144,40 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
     private void checkPermissionValidity() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
+
             // Permission is not granted
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.RECEIVE_SMS},
-                    MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+            new AlertDialog.Builder(context)
+                    .setTitle(R.string.permission_request)
+                    .setMessage(R.string.permission_description)
+                    .setPositiveButton(R.string.permission_yes, (dialog, which) -> {
+                        ActivityCompat.requestPermissions(this,
+                                new String[]{Manifest.permission.RECEIVE_SMS},
+                                MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+                    })
+                    .setNegativeButton(R.string.permission_no, (dialog, which) -> {
+                        this.finishAffinity();
+                    })
+                    .setIcon(R.mipmap.ic_launcher_round)
+                    .create().show();
 
         }
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == MY_PERMISSIONS_REQUEST_READ_CONTACTS) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+            } else {
+                Toast.makeText(
+                    this,
+                    "Spam Away can't work without SMS permission",
+                    Toast.LENGTH_SHORT
+                ).show();
+                this.finishAffinity();
+            }
+        }
     }
 
     @Override
