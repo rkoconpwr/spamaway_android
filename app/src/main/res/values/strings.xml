@@ -3,4 +3,9 @@
     <string name="action_settings">Settings</string>
     <string name="not_spam">Report mistake</string>
     <string name="spam">Confirm spam</string>
+    <string name="permission_spam_away">Spam Away</string>
+    <string name="permission_request">Permission request</string>
+    <string name="permission_description">This application requires sending SMS content to the server in order to correctly detect the likelihood of spam. Thus, a SMS read permission and Internet connection is required.</string>
+    <string name="permission_no">No, take me away!</string>
+    <string name="permission_yes">OK, I understand</string>
 </resources>

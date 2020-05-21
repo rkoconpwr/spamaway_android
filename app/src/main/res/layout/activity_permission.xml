@@ -7,20 +7,33 @@
     android:layout_height="match_parent"
     tools:context=".activities.PermissionActivity">
 
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/ic_launcher" />
+
     <TextView
         android:id="@+id/permissionTextView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:layout_marginTop="37dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="12dp"
-        android:text="Spam Away "
+        android:text="@string/permission_spam_away"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="@color/textColorPrimary"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
     <TextView
         android:id="@+id/permissionTextView"
@@ -29,7 +42,7 @@
         android:layout_marginStart="12dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="12dp"
-        android:text="Permission request"
+        android:text="@string/permission_request"
         android:textColor="@color/textColorSecondary"
         android:textSize="24sp"
         android:textStyle="italic"
@@ -42,12 +55,40 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="84dp"
         android:layout_marginEnd="24dp"
-        android:text="This application requires sending SMS content to the server in order to correctly detect the likelihood of spam. Thus, a SMS read permission and Internet connection is required. "
+        android:text="@string/permission_description"
         android:textAlignment="viewStart"
         android:textAllCaps="false"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/buttonNo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/permissionTextView" />
+
+    <Button
+        android:id="@+id/buttonNo"
+        android:layout_width="160sp"
+        android:layout_height="50sp"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/button_shape_notok"
+        android:text="@string/permission_no"
+        android:textColor="#FF4444"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/buttonYes"
+        android:layout_width="160sp"
+        android:layout_height="50sp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/button_shape_ok"
+        android:text="@string/permission_yes"
+        android:textColor="#FF4CAF50"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </android.support.constraint.ConstraintLayout>
