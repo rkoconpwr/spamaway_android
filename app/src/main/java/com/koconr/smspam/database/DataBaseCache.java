@@ -8,6 +8,7 @@ import android.support.annotation.VisibleForTesting;
 import com.koconr.smspam.database.dao.MessageDao;
 import com.koconr.smspam.model.Message;
 
+import java.util.Date;
 import java.util.List;
 
 public class DataBaseCache {
@@ -46,8 +47,8 @@ public class DataBaseCache {
         messages.add(message);
     }
 
-    public void addMessage(String sender, String content, float spamProbability) {
-        Message message = new Message(sender, content, spamProbability);
+    public void addMessage(String sender, String content, float spamProbability, Date date) {
+        Message message = new Message(sender, content, spamProbability, date.getTime());
         this.addMessage(message);
     }
 

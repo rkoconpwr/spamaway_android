@@ -8,10 +8,11 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity
 public class Message {
 
-    public Message(String sender, String content, float spamProbability) {
+    public Message(String sender, String content, float spamProbability, long date) {
         this.spamProbability = spamProbability;
         this.content = content;
         this.sender = sender;
+        this.date = date;
     }
 
     @PrimaryKey(autoGenerate = true)
@@ -25,5 +26,8 @@ public class Message {
 
     @ColumnInfo(name = "spamProbability")
     public float spamProbability;
+
+    @ColumnInfo(name = "date")
+    public long date;
 
 }

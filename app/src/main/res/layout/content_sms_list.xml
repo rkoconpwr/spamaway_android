@@ -1,42 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content_sms_list"
     android:layout_width="match_parent"
+    android:layout_height="?android:listPreferredItemHeight"
     android:layout_marginHorizontal="25dp"
     android:layout_marginVertical="15dp"
-    android:layout_height="?android:listPreferredItemHeight"
     app:theme="@style/ListStyle">
 
     <TextView
         android:id="@+id/smsPrimaryText"
         android:layout_width="wrap_content"
-        android:textColor="@color/textColorPrimary"
         android:layout_height="wrap_content"
-        android:text="A sender"
-        android:maxLines="1"
-        android:maxLength="60"
         android:ellipsize="end"
-        android:textAppearance="?android:textAppearanceListItem" />
+        android:maxLength="30"
+        android:maxLines="1"
+        android:text="A sender"
+        android:textAppearance="?android:textAppearanceListItem"
+        android:textColor="@color/textColorPrimary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/smsPrimaryDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLength="60"
+        android:maxLines="1"
+        android:text="17 Sept, 13:04"
+        android:textAppearance="?android:textAppearanceListItem"
+        android:textColor="@color/textColorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center_vertical"
-        >
-
-        <TextView
+    <TextView
         android:id="@+id/smsSecondaryText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/textColorSecondary"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
         android:ellipsize="end"
         android:maxLength="180"
         android:maxLines="2"
         android:text="A message"
-        android:textAppearance="?android:textAppearanceListItemSecondary" />
+        android:textAppearance="?android:textAppearanceListItemSecondary"
+        android:textColor="@color/textColorSecondary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/smsPrimaryText" />
 
-    </LinearLayout>
-</LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

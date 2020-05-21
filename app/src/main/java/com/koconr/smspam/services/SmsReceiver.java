@@ -21,6 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,7 +75,7 @@ public class SmsReceiver extends BroadcastReceiver {
                         AppExecutors.getInstance().databaseThread().execute(
                                 () -> {
                                     final DataBaseCache dataBaseCache = DataBaseCache.getDataBaseCache(context);
-                                    dataBaseCache.addMessage(sender, content, spamProbability.getSpamPropability());
+                                    dataBaseCache.addMessage(sender, content, spamProbability.getSpamPropability(), new Date());
                                 }
                         );
                         notification.displayNotification(smsMessage, context, spamProbability.getSpamPropability());
