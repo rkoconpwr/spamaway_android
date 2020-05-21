@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -27,6 +28,7 @@ import com.koconr.smspam.model.Message;
 import com.koconr.smspam.model.MessagesAdapter;
 import com.koconr.smspam.params.Params;
 import com.koconr.smspam.services.RequestQueueSingleton;
+import com.koconr.smspam.services.SmsSenderService;
 import com.wdullaer.swipeactionadapter.SwipeActionAdapter;
 import com.wdullaer.swipeactionadapter.SwipeDirection;
 
@@ -182,11 +184,9 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
 
     @Override
     protected void onListItemClick(ListView listView, View view, int position, long id){
-        Toast.makeText(
-                this,
-                "Clicked "+mAdapter.getItem(position),
-                Toast.LENGTH_SHORT
-        ).show();
+        Intent intent = new Intent(this, SingleSmsActivity.class);
+        intent.putExtra("myMessage", spamList.get(position));
+        startActivity(intent);
     }
 
     @Override
@@ -218,11 +218,6 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
                     this.swipeRightIsSpam(position);
                     break;
             }
-            Toast.makeText(
-                    this,
-                    dir + " swipe Action triggered on " + position,
-                    Toast.LENGTH_SHORT
-            ).show();
         }
     }
 
@@ -239,58 +234,11 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
                 () -> {
                     ArrayList<Message> messages = new ArrayList<>(dataBaseCache.getAllMessages());
                     Message message = messages.get(position);
-                    this.postSMSToServer(message, isSpam);
+                    SmsSenderService.postSmsToServerDatabase(context, message, isSpam);
                     dataBaseCache.deleteMessage(message);
                 }
         );
         spamList.remove(position);
         mAdapter.notifyDataSetChanged();
-    }
-
-    private void postSMSToServer(Message message, boolean isSpam) {
-        String url;
-        try {
-            url = Params.getUrl(Params.SEND_TO_DATABASE);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ;
-        }
-
-        final JSONObject jsonBody = new JSONObject();
-        try {
-            jsonBody.put("content", message.content);
-            jsonBody.put("isSpam", isSpam);
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-        }
-        final String requestBody = jsonBody.toString();
-
-
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                response -> {
-                    Log.i("POSITIVELY SENT TO DATABASE!", response);
-                },
-                error -> Log.e("RESPONSE ERRORLY", new String(error.networkResponse != null ? error.networkResponse.data : new byte[]{}))) {
-            @Override
-            public byte[] getBody() {
-                return requestBody.getBytes(StandardCharsets.UTF_8);
-            }
-
-            @Override
-            public Map<String, String> getHeaders() {
-                Map<String, String> headers = new HashMap<>();
-                headers.put("Content-Type", "application/json");
-                return headers;
-            }
-        };
-
-        // Add the request to the RequestQueue.
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
-                DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 10,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        RequestQueueSingleton.getInstance(context).addToRequestQueue(stringRequest);
-
     }
 }

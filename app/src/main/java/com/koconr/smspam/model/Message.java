@@ -5,8 +5,10 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
+import java.io.Serializable;
+
 @Entity
-public class Message {
+public class Message implements Serializable {
 
     public Message(String sender, String content, float spamProbability, long date) {
         this.spamProbability = spamProbability;
