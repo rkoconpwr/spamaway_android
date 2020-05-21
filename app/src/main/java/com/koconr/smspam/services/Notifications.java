@@ -40,7 +40,7 @@ public class Notifications {
 
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "M_CH_ID")
-                .setSmallIcon(R.drawable.ic_warning_black)
+                .setSmallIcon(R.drawable.ic_stat_message)
                 .setContentTitle(title)
                 .setContentText(messageBody)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
