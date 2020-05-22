@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,29 +17,18 @@ import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.toolbox.StringRequest;
 import com.koconr.smspam.R;
 import com.koconr.smspam.database.AppExecutors;
 import com.koconr.smspam.database.DataBaseCache;
 import com.koconr.smspam.model.Message;
 import com.koconr.smspam.model.MessagesAdapter;
-import com.koconr.smspam.params.Params;
 import com.koconr.smspam.services.ContactsProvider;
-import com.koconr.smspam.services.RequestQueueSingleton;
 import com.koconr.smspam.services.SmsSenderService;
 import com.wdullaer.swipeactionadapter.SwipeActionAdapter;
 import com.wdullaer.swipeactionadapter.SwipeDirection;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.List;
 
 public class SmsListActivity extends ListActivity implements SwipeActionAdapter.SwipeActionListener {
     private static int MY_PERMISSIONS_REQUEST_READ_SMS = 1;
@@ -160,7 +148,7 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
                     .setPositiveButton(R.string.permission_yes, (dialog, which) -> {
                         ActivityCompat.requestPermissions(this,
                                 new String[]{Manifest.permission.RECEIVE_SMS},
-                                MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+                                MY_PERMISSIONS_REQUEST_READ_SMS);
                     })
                     .setNegativeButton(R.string.permission_no, (dialog, which) -> {
                         this.finishAffinity();
@@ -207,7 +195,7 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
             }
 
         }
-        if (requestCode == MY_PERMISSIONS_REQUEST_READ_CONTACTS) {
+        if (requestCode == MY_PERMISSIONS_REQUEST_READ_SMS) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
             } else {
