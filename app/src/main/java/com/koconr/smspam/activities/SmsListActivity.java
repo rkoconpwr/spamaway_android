@@ -1,7 +1,6 @@
 package com.koconr.smspam.activities;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -9,24 +8,25 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
+import androidx.annotation.NonNull;
+
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.koconr.smspam.R;
 import com.koconr.smspam.database.AppExecutors;
 import com.koconr.smspam.database.DataBaseCache;
 import com.koconr.smspam.model.Message;
 import com.koconr.smspam.model.MessagesAdapter;
 import com.koconr.smspam.params.Params;
+import com.koconr.smspam.services.ContactsProvider;
 import com.koconr.smspam.services.RequestQueueSingleton;
 import com.wdullaer.swipeactionadapter.SwipeActionAdapter;
 import com.wdullaer.swipeactionadapter.SwipeDirection;
@@ -41,9 +41,11 @@ import java.util.List;
 import java.util.Map;
 
 public class SmsListActivity extends ListActivity implements SwipeActionAdapter.SwipeActionListener {
-    private static int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
+    private static int MY_PERMISSIONS_REQUEST_READ_SMS = 1;
+    private static int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 2;
+    private static int MY_PERMISSIONS_REQUEST_WRITE_CONTACTS = 3;
     private DataBaseCache dataBaseCache;
-    private ArrayList<Message> spamList;
+    private ArrayList<Message> spamList = new ArrayList<>();
     private Context context;
     protected SwipeActionAdapter mAdapter;
     private boolean hasPaused = false;
@@ -114,10 +116,10 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
         setListAdapter(mAdapter);
 
         // Set backgrounds for the swipe directions
-        mAdapter.addBackground(SwipeDirection.DIRECTION_FAR_LEFT,R.layout.row_bg_left_far)
-                .addBackground(SwipeDirection.DIRECTION_NORMAL_LEFT,R.layout.row_bg_left)
-                .addBackground(SwipeDirection.DIRECTION_FAR_RIGHT,R.layout.row_bg_right_far)
-                .addBackground(SwipeDirection.DIRECTION_NORMAL_RIGHT,R.layout.row_bg_right);
+        mAdapter.addBackground(SwipeDirection.DIRECTION_FAR_LEFT, R.layout.row_bg_left_far)
+                .addBackground(SwipeDirection.DIRECTION_NORMAL_LEFT, R.layout.row_bg_left)
+                .addBackground(SwipeDirection.DIRECTION_FAR_RIGHT, R.layout.row_bg_right_far)
+                .addBackground(SwipeDirection.DIRECTION_NORMAL_RIGHT, R.layout.row_bg_right);
     }
 
     @Override
@@ -143,41 +145,77 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
     }
 
     private void checkPermissionValidity() {
+        List<String> requestedPermissions = new ArrayList<String>();
+
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
-            // Permission is not granted
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.RECEIVE_SMS},
-                    MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+            requestedPermissions.add(Manifest.permission.RECEIVE_SMS);
 
         }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted
+            requestedPermissions.add(Manifest.permission.READ_CONTACTS);
+
+        }
+        else {
+            ContactsProvider.getContactList(this);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted
+            requestedPermissions.add(Manifest.permission.WRITE_CONTACTS);
+
+
+        }
+
+        if (!requestedPermissions.isEmpty()) {
+            String[] itemsArray = new String[requestedPermissions.size()];
+            ActivityCompat.requestPermissions(this,
+                    requestedPermissions.toArray(itemsArray),
+                    MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+        }
+
 
     }
 
     @Override
-    protected void onListItemClick(ListView listView, View view, int position, long id){
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == MY_PERMISSIONS_REQUEST_READ_CONTACTS) {
+            if (grantResults.length > 0 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                ContactsProvider.getContactList(this);
+            }
+
+        }
+    }
+
+    @Override
+    protected void onListItemClick(ListView listView, View view, int position, long id) {
         Toast.makeText(
                 this,
-                "Clicked "+mAdapter.getItem(position),
+                "Clicked " + mAdapter.getItem(position),
                 Toast.LENGTH_SHORT
         ).show();
     }
 
     @Override
-    public boolean hasActions(int position, SwipeDirection direction){
-        if(direction.equals(SwipeDirection.DIRECTION_NORMAL_LEFT)) return true;
-        if(direction.equals(SwipeDirection.DIRECTION_NORMAL_RIGHT)) return true;
+    public boolean hasActions(int position, SwipeDirection direction) {
+        if (direction.equals(SwipeDirection.DIRECTION_NORMAL_LEFT)) return true;
+        if (direction.equals(SwipeDirection.DIRECTION_NORMAL_RIGHT)) return true;
         return false;
     }
 
     @Override
-    public boolean shouldDismiss(int position, SwipeDirection direction){
+    public boolean shouldDismiss(int position, SwipeDirection direction) {
         return direction == SwipeDirection.DIRECTION_NORMAL_LEFT;
     }
 
     @Override
-    public void onSwipe(int[] positionList, SwipeDirection[] directionList){
-        for(int i=0;i<positionList.length;i++) {
+    public void onSwipe(int[] positionList, SwipeDirection[] directionList) {
+        for (int i = 0; i < positionList.length; i++) {
             SwipeDirection direction = directionList[i];
             int position = positionList[i];
             String dir = "";
@@ -225,9 +263,10 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
         String url;
         try {
             url = Params.getUrl(Params.SEND_TO_DATABASE);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
-            return ;
+            return;
         }
 
         final JSONObject jsonBody = new JSONObject();
