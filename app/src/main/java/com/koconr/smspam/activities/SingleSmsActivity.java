@@ -34,7 +34,7 @@ public class SingleSmsActivity extends AppCompatActivity {
             Locale locale =  this.getResources().getConfiguration().getLocales().get(0);
             Date date = new Date(message.date);
 
-            smsTitle.setText(message.sender);
+            smsTitle.setText(message.getSenderName());
             smsDate.setText(new SimpleDateFormat("dd MMM, HH:mm", locale).format(date));
             smsMessage.setText(message.content);
         }

@@ -42,7 +42,7 @@ public class MessagesAdapter extends ArrayAdapter<Message> {
             Locale locale =  context.getResources().getConfiguration().getLocales().get(0);
             Date date = new Date(message.date);
 
-            smsPrimaryView.setText(message.sender);
+            smsPrimaryView.setText(message.getSenderName());
             smsSecondaryView.setText(message.content);
             smsDateView.setText(new SimpleDateFormat("dd MMM, HH:mm", locale).format(date));
         }

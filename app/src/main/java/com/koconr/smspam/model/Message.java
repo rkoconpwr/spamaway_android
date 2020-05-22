@@ -5,6 +5,8 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
+import com.koconr.smspam.services.ContactsProvider;
+
 import java.io.Serializable;
 
 @Entity
@@ -31,5 +33,10 @@ public class Message implements Serializable {
 
     @ColumnInfo(name = "date")
     public long date;
+
+    public String getSenderName() {
+        String telNumber = this.sender;
+        return ContactsProvider.getContactName(telNumber);
+    }
 
 }
