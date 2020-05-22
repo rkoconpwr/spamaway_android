@@ -24,14 +24,14 @@ public class Notifications {
     }
 
     public void displayNotification(SmsMessage smsMessage, Context context, float spamProbability) {
-        NotificationCompat.Builder builder = this.buildNotification(smsMessage, context,spamProbability);
+        NotificationCompat.Builder builder = this.buildNotification(smsMessage, context, spamProbability);
         this.displayNotification(builder, context);
     }
 
     private NotificationCompat.Builder buildNotification(SmsMessage smsMessage, Context context, double spamProbability) {
         String messageHeader = smsMessage.getDisplayOriginatingAddress();
         String title = "Probable SPAM detected!";
-        String messageBody = String.format("Last message from %s is for %d%% spam", messageHeader, (int)(spamProbability*100));
+        String messageBody = String.format("Last message from %s is for %d%% spam", ContactsProvider.getContactName(messageHeader), (int) (spamProbability * 100));
 
         // Create an explicit intent for an Activity in your app
         Intent intent = new Intent(context, SmsListActivity.class);
@@ -52,8 +52,7 @@ public class Notifications {
 
     private void displayNotification(NotificationCompat.Builder builder, Context context) {
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-        {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager manager =
                     (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             String channelId = "Your_channel_id";
@@ -65,7 +64,7 @@ public class Notifications {
             builder.setChannelId(channelId);
             manager.notify(315, builder.build());
         }
-        else{
+        else {
             int notificationId = 315;
             NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
             notificationManagerCompat.notify(notificationId, builder.build());
