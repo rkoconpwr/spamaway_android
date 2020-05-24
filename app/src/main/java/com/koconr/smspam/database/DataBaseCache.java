@@ -1,8 +1,8 @@
 package com.koconr.smspam.database;
 
-import android.arch.persistence.room.Room;
+import androidx.room.Room;
 import android.content.Context;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.VisibleForTesting;
 
 
 import com.koconr.smspam.database.dao.MessageDao;
