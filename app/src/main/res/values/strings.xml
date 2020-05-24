@@ -10,4 +10,14 @@
     <string name="permission_yes">OK</string>
     <!--    <string name="permission_no">No, take me away!</string>-->
     <!--    <string name="permission_yes">OK, I understand</string>-->
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Preference Titles -->
+    <string name="feedback_header">Messages</string>
+
+    <!-- Feedback Preferences -->
+    <string name="feedback_summary_on">I agree to send SMS content to the server to improve the spam checking model.
+    </string>
+    <string name="feedback_summary_off">I do not want to provide any feedback.</string>
+    <string name="attachment_title">Provide feedback</string>
 </resources>

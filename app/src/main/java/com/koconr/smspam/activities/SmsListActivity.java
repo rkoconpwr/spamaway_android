@@ -5,11 +5,14 @@ import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,15 +37,21 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
     private static int MY_PERMISSIONS_REQUEST_READ_SMS = 1;
     private static int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 2;
     private static int MY_PERMISSIONS_REQUEST_WRITE_CONTACTS = 3;
+    private static final String FEEDBACK = "feedback";
+
     private DataBaseCache dataBaseCache;
     private ArrayList<Message> spamList = new ArrayList<>();
     private Context context;
     protected SwipeActionAdapter mAdapter;
+    private SharedPreferences pref;
+
     private boolean hasPaused = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        context = this;
+        this.context = this;
+        this.pref = PreferenceManager.getDefaultSharedPreferences(context);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sms_list);
         this.checkPermissionValidity();
@@ -128,6 +137,9 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
             return true;
         }
 
@@ -257,11 +269,21 @@ public class SmsListActivity extends ListActivity implements SwipeActionAdapter.
     }
 
     private void deleteFromDatabase(int position, boolean isSpam) {
+        boolean isAllowed = pref.getBoolean(FEEDBACK, false);
         AppExecutors.getInstance().databaseThread().execute(
                 () -> {
                     ArrayList<Message> messages = new ArrayList<>(dataBaseCache.getAllMessages());
                     Message message = messages.get(position);
-                    SmsSenderService.postSmsToServerDatabase(context, message, isSpam);
+                    if (isAllowed) {
+                        SmsSenderService.postSmsToServerDatabase(context, message, isSpam);
+                    } else {
+                        // Toast about no agreement; not working on different threads, whatever
+//                        Toast.makeText(
+//                                this,
+//                                "There is no allowance for feedback!",
+//                                Toast.LENGTH_SHORT
+//                        ).show();
+                    }
                     dataBaseCache.deleteMessage(message);
                 }
         );
