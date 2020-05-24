@@ -16,7 +16,7 @@
     <string name="feedback_header">Messages</string>
 
     <!-- Feedback Preferences -->
-    <string name="feedback_summary_on">I agree to send SMS content to the server to improve the spam checking model.
+    <string name="feedback_summary_on">I agree to send SMS content to the server to improve the spam detection.
     </string>
     <string name="feedback_summary_off">I do not want to provide any feedback.</string>
     <string name="attachment_title">Provide feedback</string>
