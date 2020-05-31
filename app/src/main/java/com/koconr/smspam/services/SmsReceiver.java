@@ -58,7 +58,7 @@ public class SmsReceiver extends BroadcastReceiver {
         }
 
         final String requestBody = jsonBody.toString();
-        Log.i("BODY FORMAT", requestBody);
+        //Log.i("BODY FORMAT", requestBody);
 
 
         // Request a string response from the provided URL.
@@ -66,7 +66,7 @@ public class SmsReceiver extends BroadcastReceiver {
                 response -> {
                     // Display the first 500 characters of the response string.
                     // textView.setText("Response is: "+ response.substring(0,500));
-                    Log.i("MESSAGE RECEIVED!", response);
+                    //Log.i("MESSAGE RECEIVED!", response);
                     SpamProbabilityModel spamProbability = notification.isSpam(response);
                     if (spamProbability.isSpam()) {
                         String sender = smsMessage.getDisplayOriginatingAddress();
@@ -81,7 +81,7 @@ public class SmsReceiver extends BroadcastReceiver {
                         notification.displayNotification(smsMessage, context, spamProbability.getSpamPropability());
                     }
                 },
-                error -> Log.e("RESPONSE ERRORLY", new String(error.networkResponse != null ? error.networkResponse.data : new byte[]{}))) {
+                error -> new Object()) {
             @Override
             public byte[] getBody() {
                 return requestBody.getBytes(StandardCharsets.UTF_8);

@@ -69,7 +69,7 @@ public class Notifications {
             NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
             notificationManagerCompat.notify(notificationId, builder.build());
         }
-        Log.i("Wywalam powiadomienie", "asdasdasd");
+        //Log.i("Wywalam powiadomienie", "asdasdasd");
 
 
     }

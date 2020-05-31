@@ -1,7 +1,6 @@
 package com.koconr.smspam.services;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -22,9 +21,10 @@ public class SmsSenderService {
         String url;
         try {
             url = Params.getUrl(Params.SEND_TO_DATABASE);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
-            return ;
+            return;
         }
 
         final JSONObject jsonBody = new JSONObject();
@@ -40,9 +40,9 @@ public class SmsSenderService {
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 response -> {
-                    Log.i("POSITIVELY SENT TO DATABASE!", response);
+                    //Log.i("POSITIVELY SENT TO DATABASE!", response);
                 },
-                error -> Log.e("RESPONSE ERRORLY", new String(error.networkResponse != null ? error.networkResponse.data : new byte[]{}))) {
+                error -> new Object()) {
             @Override
             public byte[] getBody() {
                 return requestBody.getBytes(StandardCharsets.UTF_8);
